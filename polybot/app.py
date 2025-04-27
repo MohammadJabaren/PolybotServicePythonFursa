@@ -3,6 +3,7 @@ from flask import request
 import os
 from bot import Bot, QuoteBot, ImageProcessingBot
 
+
 app = flask.Flask(__name__)
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
