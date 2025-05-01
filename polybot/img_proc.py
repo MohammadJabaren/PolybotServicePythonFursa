@@ -1,5 +1,6 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
+import random
 
 
 def rgb2gray(rgb):
@@ -15,15 +16,24 @@ class Img:
         Do not change the constructor implementation
         """
         self.path = Path(path)
-        self.data = rgb2gray(imread(path)).tolist()
+        try:
+            image = imread(path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to read image from path '{path}': {e}")
+        if image.ndim != 3 or image.shape[2] != 3:
+            raise RuntimeError("Input image is not an RGB image")
+        self.data = rgb2gray(image).tolist()
 
     def save_img(self):
         """
         Do not change the below implementation
         """
         new_path = self.path.with_name(self.path.stem + '_filtered' + self.path.suffix)
-        imsave(new_path, self.data, cmap='gray')
-        return new_path
+        try:
+            imsave(new_path, self.data, cmap='gray')
+            return new_path
+        except Exception as e:
+            raise RuntimeError(f"An error occurred while saving the image: {e}")
 
     def blur(self, blur_level=16):
 
@@ -50,18 +60,93 @@ class Img:
 
             self.data[i] = res
 
+
     def rotate(self):
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+       # if not isinstance(self.data, list) or not all(isinstance(row, list) for row in self.data):
+        #    raise RuntimeError("This image is not a grayscale image.")
+
+        #if len(self.data) == 0:
+         #   raise RuntimeError("The images is Empty.")
+
+        row = len(self.data)
+        col = len(self.data[0])
+
+        new_matrix = [[0] * row for _ in range(col)]
+
+        for i in range(row):
+            for j in range(col):
+                new_matrix[j][row - 1 - i] = self.data[i][j]
+
+        self.data = new_matrix
+
 
     def salt_n_pepper(self):
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        #if not isinstance(self.data, list) or not all(isinstance(row, list) for row in self.data):
+        #    raise RuntimeError("This image is not a grayscale image.")
 
-    def concat(self, other_img, direction='horizontal'):
+        #if len(self.data) == 0:
+        #    raise RuntimeError("The images is Empty.")
+
+
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                random_value = random.random()
+                if random_value < 0.2 :
+                    self.data[i][j] = 255
+                elif random_value > 0.8:
+                    self.data[i][j] = 0
+
+
+    def concat(self, other_img, direction):
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        #if not isinstance(other_img,Img):
+        #    raise RuntimeError("Provided argument is not an image")
+
+        #if not isinstance(self.data, list) or not all(isinstance(row, list) for row in self.data):
+        #    raise RuntimeError("This image is not a grayscale image.")
+
+        #if not isinstance(other_img.data, list) or not all(isinstance(row, list) for row in other_img.data):
+        #    raise RuntimeError("The other image is not a grayscale image.")
+
+        #if len(self.data) == 0 or len(other_img.data) == 0:
+        #    raise RuntimeError("One of the images is empty.")
+
+        if direction == 'horizontal':
+            if len(self.data) != len(other_img.data):
+                raise RuntimeError(
+                    f"Images have different heights ({len(self.data)} != {len(other_img.data)}). Cannot concatenate horizontally."
+                )
+            self.data = [self.data[i] + other_img.data[i] for i in range(len(self.data))]
+
+        elif direction == 'vertical':
+            if len(self.data[0]) != len(other_img.data[0]):
+                raise RuntimeError(
+                    f"Images have different widths ({len(self.data[0])} != {len(other_img.data[0])}). Cannot concatenate vertically."
+                )
+            self.data = self.data + other_img.data
+
+        else:
+            raise RuntimeError(
+                f"Invalid direction '{direction}' specified. Only 'horizontal' and 'vertical' are allowed.")
+
+
+
 
     def segment(self):
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+       # if not isinstance(self.data, list) or not all(isinstance(row, list) for row in self.data):
+       #     raise RuntimeError("This image is not a grayscale image.")
+
+        #if len(self.data) == 0:
+        #    raise RuntimeError("The images is Empty.")
+        hundred = 100
+
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                if self.data[i][j] > hundred:
+                    self.data[i][j] = 255
+                else:
+                    self.data[i][j] = 0
+
