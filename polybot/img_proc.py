@@ -150,3 +150,27 @@ class Img:
                 else:
                     self.data[i][j] = 0
 
+    def inverse(self):
+
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                self.data[i][j] = 255 - self.data[i][j]
+
+    def gamma_correction(self):
+
+        gamma = 2.2
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                normalized = self.data[i][j] / 255.0
+                corrected = pow(normalized, gamma)
+                self.data[i][j] = min(255, max(0, round(corrected * 255)))
+
+    def posterize(self):
+        level = 4
+        step = 255 // (level - 1)
+        for i in range(len(self.data)):
+            for j in range(len(self.data[0])):
+                original = self.data[i][j]
+                quantized = round(original / step) * step
+                self.data[i][j] = min(255, max(0, quantized))
+
