@@ -99,7 +99,7 @@ class Img:
                     self.data[i][j] = 0
 
 
-    def concat(self, other_img, direction):
+    def concat(self, other_img, direction='horizontal'):
         # TODO remove the `raise` below, and write your implementation
         #if not isinstance(other_img,Img):
         #    raise RuntimeError("Provided argument is not an image")
