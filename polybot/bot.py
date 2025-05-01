@@ -75,6 +75,36 @@ class QuoteBot(Bot):
 
 
 class ImageProcessingBot(Bot):
+    def send_welcome_message(self, chat_id):
+        self.send_text(chat_id,
+                       "👋 Hello! I'm your image processing bot.\n\n"
+                       "📷 Send me a photo with one of these captions to apply a filter:\n"
+                       "- blur\n- contour\n- rotate\n- segment\n- salt and pepper\n- gamma correction\n- posterize\n- inverse\n\n"
+                       "🖼️ To concatenate two images, send them as a media group (album) with one of these captions:\n"
+                       "- concat horizontal\n- concat vertical"
+                       "❓ If you need more details or assistance, feel free to type /help for further instructions!")
+
+    def send_help_message(self, chat_id):
+        help_text = (
+            "Here's how to use the Image Processing Bot:\n\n"
+            "- **/start**: Get a welcome message and instructions on available features.\n"
+            "- **/help**: Show this help message with all available commands.\n\n"
+            "For image processing, you can send a photo and add a caption like:\n"
+            "- **blur**: Apply blur effect on the image.\n"
+            "- **contour**: Apply contour effect on the image.\n"
+            "- **rotate**: Rotate the image.\n"
+            "- **segment**: Apply image segmentation.\n"
+            "- **gamma correction**: Adjust the brightness of the image using gamma correction.\n"
+            "- **inverse**: Invert the colors of the image.\n"
+            "- **posterize**: Reduce the number of colors in the image for a stylized effect.\n"
+            "- **salt and pepper**: Add salt-and-pepper noise to the image.\n\n"
+            "You can also concatenate two images with captions like:\n"
+            "- **concat horizontal**: Combine two images side by side.\n"
+            "- **concat vertical**: Combine two images top to bottom.\n\n"
+            "To concatenate images, send them as a media group (album) with the respective caption!"
+        )
+        self.send_text(chat_id, help_text)
+
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
 
@@ -82,6 +112,16 @@ class ImageProcessingBot(Bot):
             chat_id = msg['chat']['id']
             caption = msg.get("caption", "").strip().lower()
             media_group_id = msg.get('media_group_id')
+
+            if 'text' in msg:
+                text = msg['text'].strip().lower()
+
+                if text == "/start":
+                    self.send_welcome_message(chat_id)
+                    return
+                elif text == "/help":
+                    self.send_help_message(chat_id)
+                    return
 
             if media_group_id:
                 if media_group_id not in self.media_group_cache:
@@ -119,7 +159,7 @@ class ImageProcessingBot(Bot):
             if not self.is_current_msg_photo(msg):
                 self.send_text(chat_id,
                                "Send a photo with one of these captions:\n"
-                               "- blur\n- contour\n- rotate\n- segment\n- salt and pepper\n"
+                               "- blur\n- contour\n- rotate\n- segment\n- salt and pepper\n- gamma correction\n- posterize\n- inverse\n"
                                "- concat horizontal or concat vertical (send 2 photos as album)"
                                )
                 return
@@ -141,6 +181,12 @@ class ImageProcessingBot(Bot):
                 image.salt_n_pepper()
             elif caption == 'segment':
                 image.segment()
+            elif caption == 'gamma correction':
+                image.gamma_correction()
+            elif caption == 'posterize':
+                image.posterize()
+            elif caption == 'inverse':
+                image.inverse()
             else:
                 self.send_text(chat_id, f"Unsupported filter: {caption}")
                 return
