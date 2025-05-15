@@ -63,4 +63,5 @@ if [ -f "$SERVICE_FILE" ]; then
       echo "❌ polybot.service is not running."
       sudo systemctl status polybot.service --no-pager
       exit 1
+    fi
 fi
