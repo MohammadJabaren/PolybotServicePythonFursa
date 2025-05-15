@@ -12,7 +12,7 @@ cd "$PROJECT_DIR"
 sudo cp polyservice.service /etc/systemd/system/
 VENV_DIR="$PROJECT_DIR/.venv"
 ENV_FILE="$PROJECT_DIR/polybot/.env"
-SERVICE_FILE="yolo.service"  # change this if your service file has a different name
+SERVICE_FILE="polyservice.service"  # change this if your service file has a different name
 
 echo "==> Using project directory: $PROJECT_DIR"
 
