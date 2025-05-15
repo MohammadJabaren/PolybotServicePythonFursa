@@ -59,7 +59,8 @@ if [ -f "$SERVICE_FILE" ]; then
     sudo systemctl restart "$SERVICE_FILE"
     sudo systemctl enable "$SERVICE_FILE"
     echo " Service reloaded and restarted."
-else
-    echo " Service file $SERVICE_FILE not found!"
-    exit 1
+    if ! systemctl is-active --quiet yolo.service; then
+      echo "❌ yolo.service is not running."
+      sudo systemctl status yolo.service --no-pager
+      exit 1
 fi
