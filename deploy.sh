@@ -30,7 +30,7 @@ echo " Virtual environment activated."
 
 # === 4. Install dependencies ===
 pip install --upgrade pip
-pip install -r "$PROJECT_DIR/requirements.txt"
+pip install -r "$PROJECT_DIR/polybot/requirements.txt"
 echo "✅ Python requirements installed."
 
 # === 5. Ensure .env file contains correct secrets ===
