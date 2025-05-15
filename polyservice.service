@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=ubuntu
 WorkingDirectory=/home/ubuntu/PolybotServicePythonFursa
-ExecStart=/bin/bash /home/ubuntu/startPolyBot.sh /home/ubuntu/PolybotServicePythonFursa
+ExecStart=/bin/bash /home/ubuntu/polybot/startPolyBot.sh /home/ubuntu/PolybotServicePythonFursa
 Restart=always
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
