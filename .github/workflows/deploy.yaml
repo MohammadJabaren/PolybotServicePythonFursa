@@ -53,7 +53,7 @@ jobs:
               git clone --branch $BRANCH_NAME ${REPO_URL} ~/${REPO_NAME}
             fi
           "
-
+#test
       - name: Execute script on EC2
         run: |
           ssh ec2 "cd $REPO_NAME && bash deploy.sh ~/${REPO_NAME} ${{secrets.TELEGRAM_TOKEN}} ${{secrets.YOLO_IP}}"
