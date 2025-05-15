@@ -26,7 +26,6 @@ fi
 
 # === 3. Activate the virtual environment ===
 source "$VENV_DIR/bin/activate"
-echo " Virtual environment activated."
 
 # === 4. Install dependencies ===
 pip install --upgrade pip
