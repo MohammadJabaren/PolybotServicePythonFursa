@@ -8,7 +8,7 @@ on:
      - main
   pull_request:
     branches:
-      - feature/automation
+      - main
 
   # Allow to run it manually as well from GitHub web
   workflow_dispatch:
