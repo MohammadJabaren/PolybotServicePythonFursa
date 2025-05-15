@@ -27,7 +27,7 @@ fi
 # === 3. Activate the virtual environment ===
 source "$VENV_DIR/bin/activate"
 #Test
-pip install -r requirements.txt
+pip install -r "$PROJECT_DIR/polybot/requirements.txt"
 echo " Python requirements installed."
 
 # === 5. Ensure .env file contains correct secrets ===
