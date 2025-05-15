@@ -6,6 +6,7 @@ on:
   push:
     branches:
      - main
+     - feature/automation
   pull_request:
     branches:
       - main
