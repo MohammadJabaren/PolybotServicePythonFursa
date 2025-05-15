@@ -27,8 +27,6 @@ fi
 # === 3. Activate the virtual environment ===
 source "$VENV_DIR/bin/activate"
 
-# === 4. Install dependencies ===
-pip install --upgrade pip
 echo " Python requirements installed."
 
 # === 5. Ensure .env file contains correct secrets ===
