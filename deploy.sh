@@ -36,7 +36,7 @@ if [ ! -f "$ENV_FILE" ]; then
     echo ".env file does NOT exist — creating it..."
     touch "$ENV_FILE"
 fi
-
+###
 set_env_var() {
     KEY="$1"
     VALUE="$2"
