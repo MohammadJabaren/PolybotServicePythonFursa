@@ -12,7 +12,7 @@ cd "$PROJECT_DIR"
 sudo cp polyservice.service /etc/systemd/system/
 VENV_DIR="$PROJECT_DIR/.venv"
 ENV_FILE="$PROJECT_DIR/polybot/.env"
-SERVICE_FILE="yolo.service"  # change this if your service file has a different name
+SERVICE_FILE="polyservice.service"  # change this if your service file has a different name
 
 echo "==> Using project directory: $PROJECT_DIR"
 
@@ -26,12 +26,8 @@ fi
 
 # === 3. Activate the virtual environment ===
 source "$VENV_DIR/bin/activate"
-echo " Virtual environment activated."
 
-# === 4. Install dependencies ===
-pip install --upgrade pip
-pip install -r "$PROJECT_DIR/requirements.txt"
-echo "✅ Python requirements installed."
+echo " Python requirements installed."
 
 # === 5. Ensure .env file contains correct secrets ===
 if [ ! -f "$ENV_FILE" ]; then
@@ -63,7 +59,8 @@ if [ -f "$SERVICE_FILE" ]; then
     sudo systemctl restart "$SERVICE_FILE"
     sudo systemctl enable "$SERVICE_FILE"
     echo " Service reloaded and restarted."
-else
-    echo " Service file $SERVICE_FILE not found!"
-    exit 1
+    if ! systemctl is-active --quiet polybot.service; then
+      echo "❌ polybot.service is not running."
+      sudo systemctl status polybot.service --no-pager
+      exit 1
 fi
