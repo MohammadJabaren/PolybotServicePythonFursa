@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+#Test
 # === 1. Fetch parameters from script arguments ===
 PROJECT_DIR="$1"
 TELEGRAM_TOKEN="$2"
