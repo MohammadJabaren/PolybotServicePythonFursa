@@ -5,7 +5,7 @@ on:
       - main
 
 permissions: {}
-#test
+
 jobs:
   TestImgProcessingChatbotApp:
     runs-on: ubuntu-latest
