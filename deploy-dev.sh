@@ -12,8 +12,7 @@ cd "$PROJECT_DIR"
 # copy the .servcie file
 sudo apt update
 
-sudo cp polyservice-dev.service /etc/systemd/system/
-VENV_DIR="$PROJECT_DIR/.venv"
+sudo cp "$PROJECT_DIR/polyservice-dev.service" /etc/systemd/system/
 ENV_FILE="$PROJECT_DIR/polybot/.env"
 SERVICE_FILE="polyservice-dev.service"  # change this if your service file has a different name
 
