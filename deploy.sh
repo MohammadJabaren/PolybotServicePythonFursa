@@ -6,7 +6,43 @@ PROJECT_DIR="$1"
 TELEGRAM_TOKEN="$2"
 YOLO_IP="$3"
 
+
+#Monitoring
+while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+  echo "Waiting for dpkg lock to be released..."
+  sleep 5
+done
+sudo apt-get update
+sudo apt-get -y install wget
+wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.127.0/otelcol_0.127.0_linux_amd64.deb
+sudo dpkg -i otelcol_0.127.0_linux_amd64.deb
+
+
+# Check if otelcol service is active
+if ! systemctl is-active --quiet otelcol; then
+  echo "otelcol service is NOT running."
+  exit 1
+else
+  echo "otelcol service is running."
+fi
+
+
 cd "$PROJECT_DIR"
+
+#Copy the file into etc/otelcol
+sudo cp "$PROJECT_DIR/config.yaml" /etc/otelcol/
+
+
+#restart otelcol
+sudo systemctl daemon-reload
+sudo systemctl restart otelcol
+sudo systemctl enable otelcol
+if ! systemctl is-active --quiet otelcol; then
+      echo "❌ otelcol is not running Yet."
+      sudo systemctl status otelcol --no-pager
+      exit 1
+fi
+
 
 # copy the .servcie file
 sudo cp polyservice.service /etc/systemd/system/
