@@ -18,7 +18,7 @@ if not os.path.exists(PHOTO_DIR):
 
 YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3")
-S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+S3_BUCKET = "jabaren-polybot-image"
 
 
 class Bot:
@@ -249,6 +249,7 @@ class ImageProcessingBot(Bot):
                     detected_labels = [obj["label"] for obj in detection_objects if "label" in obj]
                     objects_message = "Detected objects: " + ", ".join(
                         detected_labels) if detected_labels else "No objects detected."
+                    self.send_text(chat_id, objects_message)
 
 
                 else:
