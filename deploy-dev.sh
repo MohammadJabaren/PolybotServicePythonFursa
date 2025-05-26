@@ -6,16 +6,30 @@ PROJECT_DIR="$1"
 TELEGRAM_TOKEN="$2"
 YOLO_IP="$3"
 YOUR_AUTHTOKEN="$4"
+DEB_FILE="otelcol_0.127.0_linux_amd64.deb"
+
 
 #Monitoring
 while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
   echo "Waiting for dpkg lock to be released..."
   sleep 5
 done
-sudo apt-get update
-sudo apt-get -y install wget
-wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.127.0/otelcol_0.127.0_linux_amd64.deb
-sudo dpkg -i otelcol_0.127.0_linux_amd64.deb
+if ! command -v otelcol &> /dev/null; then
+  echo "otelcol not found. Installing..."
+  sudo apt-get update
+  sudo apt-get -y install wget
+
+  if [ ! -f "$DEB_FILE" ]; then
+    wget "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.127.0/$DEB_FILE"
+  else
+    echo "$DEB_FILE already exists. Skipping download."
+  fi
+
+  sudo dpkg -i "$DEB_FILE"
+else
+  echo "otelcol is already installed. Skipping installation."
+fi
+
 
 
 # Check if otelcol service is active
