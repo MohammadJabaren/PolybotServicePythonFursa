@@ -10,7 +10,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-YOLO_IP = os.getenv("YOLO_IP")  # Read YOLO IP from environment
+YOLO_IP = os.getenv("YOLO_IP_DEV") or os.getenv("YOLO_IP")
+
+if YOLO_IP is None:
+    raise ValueError("YOLO_IP_DEV and YOLO_IP are both not set in the environment variables.")
 
 class Bot:
 
