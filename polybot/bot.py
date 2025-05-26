@@ -10,24 +10,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-import subprocess
+YOLO_IP = os.getenv("YOLO_IP_DEV") or os.getenv("YOLO_IP")
 
-def get_git_branch():
-    try:
-        result = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                                check=True,
-                                text=True)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError:
-        return None
-
-branch = get_git_branch()
-if branch == 'dev':
-    YOLO_IP = os.getenv("YOLO_IP_DEV")
-else:
-    YOLO_IP = os.getenv("YOLO_IP")  # fallback
+if YOLO_IP is None:
+    raise ValueError("YOLO_IP_DEV and YOLO_IP are both not set in the environment variables.")
 
 class Bot:
 
