@@ -5,27 +5,37 @@ set -e
 PROJECT_DIR="$1"
 TELEGRAM_TOKEN="$2"
 YOLO_IP="$3"
+YOUR_AUTHTOKEN="$4"
 
 cd "$PROJECT_DIR"
 
 # copy the .servcie file
-sudo cp polyservice-dev.service /etc/systemd/system/
+sudo apt update
+
+sudo cp "$PROJECT_DIR/polyservice-dev.service" /etc/systemd/system/
 VENV_DIR="$PROJECT_DIR/.venv"
 ENV_FILE="$PROJECT_DIR/polybot/.env"
 SERVICE_FILE="polyservice-dev.service"  # change this if your service file has a different name
 
 echo "==> Using project directory: $PROJECT_DIR"
 
+if [ ! -f ~/.ngrok2/ngrok.yml ]; then
+  ngrok config add-authtoken "$YOUR_AUTHTOKEN"
+fi
+
 # === 2. Check/create virtual environment ===
 if [ -d "$VENV_DIR" ]; then
     echo " Virtual environment exists."
 else
     echo " Creating virtual environment..."
+    sudo apt install python3-venv
     python3 -m venv "$VENV_DIR"
 fi
 
 # === 3. Activate the virtual environment ===
 source "$VENV_DIR/bin/activate"
+sudo apt install jq -y
+
 #Test
 pip install --upgrade pip
 pip install -r "$PROJECT_DIR/polybot/requirements.txt"
