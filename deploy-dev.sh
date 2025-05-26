@@ -8,6 +8,10 @@ YOLO_IP="$3"
 YOUR_AUTHTOKEN="$4"
 
 #Monitoring
+while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+  echo "Waiting for dpkg lock to be released..."
+  sleep 5
+done
 sudo apt-get update
 sudo apt-get -y install wget
 wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.127.0/otelcol_0.127.0_linux_amd64.deb
@@ -25,6 +29,10 @@ fi
 cd "$PROJECT_DIR"
 
 # copy the .servcie file
+while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+  echo "Waiting for dpkg lock to be released..."
+  sleep 5
+done
 sudo apt update
 #Copy the file into etc/otelcol
 sudo cp "$PROJECT_DIR/config.yaml" /etc/otelcol/
