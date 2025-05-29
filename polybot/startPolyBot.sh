@@ -62,7 +62,7 @@ main() {
     # Activate venv and run the app
     source "$VENV_PATH/bin/activate"
     echo "Virtual environment activated."
-
+    cd "$project_path"
     echo "Launching bot..."
     python -m polybot.app
 }
