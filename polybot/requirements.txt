@@ -3,4 +3,11 @@ loguru>=0.7.0
 requests>=2.31.0
 flask>=2.3.2
 matplotlib>=3.7.5
-python-dotenv
+
+# AWS SDK for Python (S3 upload/download)
+boto3>=1.26.0
+
+
+# Environment variable loader
+python-dotenv>=1.0.0
+

@@ -1,18 +1,24 @@
 import telebot
 from loguru import logger
 import os
-from telebot.types import InputFile
-from polybot.img_proc import Img
+import uuid
 import time
+import boto3
 import requests
 from dotenv import load_dotenv
-#import
-# Load environment variables from .env file
+from telebot.types import InputFile
+from polybot.img_proc import Img
+
+
 load_dotenv()
 
+PHOTO_DIR = 'photos'
+if not os.path.exists(PHOTO_DIR):
+    os.makedirs(PHOTO_DIR)
+
 YOLO_IP = os.getenv("YOLO_IP")
-
-
+s3 = boto3.client("s3")
+S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
 class Bot:
 
@@ -35,27 +41,44 @@ class Bot:
     def is_current_msg_photo(self, msg):
         return 'photo' in msg
 
-    def download_user_photo(self, msg):
-        if not self.is_current_msg_photo(msg):
-            raise RuntimeError(f'Message content of type \'photo\' expected')
-
-        file_info = self.telegram_bot_client.get_file(msg['photo'][-1]['file_id'])
-        data = self.telegram_bot_client.download_file(file_info.file_path)
-        folder_name = file_info.file_path.split('/')[0]
-
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
-
-        with open(file_info.file_path, 'wb') as photo:
-            photo.write(data)
-
-        return file_info.file_path
-
     def send_photo(self, chat_id, img_path):
         if not os.path.exists(img_path):
             raise RuntimeError("Image path doesn't exist")
 
         self.telegram_bot_client.send_photo(chat_id, InputFile(img_path))
+
+    def download_user_photo(self, msg):
+        if not self.is_current_msg_photo(msg):
+            raise RuntimeError("Message content of type 'photo' expected")
+
+        try:
+            file_info = self.telegram_bot_client.get_file(msg['photo'][-1]['file_id'])
+            data = self.telegram_bot_client.download_file(file_info.file_path)
+
+            ext = os.path.splitext(file_info.file_path)[1]
+            image_name = f"{uuid.uuid4().hex}{ext}"
+
+            # Save the image in the specified 'photos' directory
+            local_image_path = os.path.join(PHOTO_DIR, image_name)
+            with open(local_image_path, 'wb') as f:
+                f.write(data)
+
+            # Ensure the file was saved before proceeding
+            if not os.path.exists(local_image_path):
+                raise RuntimeError(f"Failed to save the image locally at {local_image_path}")
+
+            # Upload image to S3
+            with open(local_image_path, 'rb') as f:
+                s3.put_object(Bucket=S3_BUCKET, Key=image_name, Body=f)
+
+            logger.info(f"Image uploaded successfully with name: {image_name}")
+
+            return local_image_path
+
+        except Exception as e:
+            logger.error(f"Error downloading or uploading image: {e}")
+            raise RuntimeError("Error processing the image. Please try again.")
+
 
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
@@ -80,30 +103,30 @@ class ImageProcessingBot(Bot):
 
     def send_help_message(self, chat_id):
         help_text = (
-	    "Here's how to use the Image Processing Bot:\n\n"
-	    "- **/start**: Get a welcome message and instructions on available features.\n"
-	    "- **/help**: Show this help message with all available commands.\n\n"
-	    "For image processing, you can send a photo and add a caption like:\n"
-	    "- **blur**: Apply blur effect on the image.\n"
-	    "- **contour**: Apply contour effect on the image.\n"
-	    "- **rotate**: Rotate the image.\n"
-	    "- **segment**: Apply image segmentation.\n"
-	    "- **gamma correction**: Adjust the brightness of the image using gamma correction.\n"
-	    "- **inverse**: Invert the colors of the image.\n"
-	    "- **posterize**: Reduce the number of colors in the image for a stylized effect.\n"
-	    "- **salt and pepper**: Add salt-and-pepper noise to the image.\n"
-	    "- **detection**: Perform object detection on the image.\n\n"
-	    "You can also concatenate two images with captions like:\n"
-	    "- **concat horizontal**: Combine two images side by side.\n"
-	    "- **concat vertical**: Combine two images top to bottom.\n\n"
-	    "To concatenate images, send them as a media group (album) with the respective caption!"
-	)
+            "Here's how to use the Image Processing Bot:\n\n"
+            "- **/start**: Get a welcome message and instructions on available features.\n"
+            "- **/help**: Show this help message with all available commands.\n\n"
+            "For image processing, you can send a photo and add a caption like:\n"
+            "- **blur**: Apply blur effect on the image.\n"
+            "- **contour**: Apply contour effect on the image.\n"
+            "- **rotate**: Rotate the image.\n"
+            "- **segment**: Apply image segmentation.\n"
+            "- **gamma correction**: Adjust the brightness of the image using gamma correction.\n"
+            "- **inverse**: Invert the colors of the image.\n"
+            "- **posterize**: Reduce the number of colors in the image for a stylized effect.\n"
+            "- **salt and pepper**: Add salt-and-pepper noise to the image.\n"
+            "- **detection**: Perform object detection on the image.\n\n"
+            "You can also concatenate two images with captions like:\n"
+            "- **concat horizontal**: Combine two images side by side.\n"
+            "- **concat vertical**: Combine two images top to bottom.\n\n"
+            "To concatenate images, send them as a media group (album) with the respective caption!"
+        )
+
 
         self.send_text(chat_id, help_text)
 
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
-
         try:
             chat_id = msg['chat']['id']
             caption = msg.get("caption", "").strip().lower()
@@ -206,8 +229,13 @@ class ImageProcessingBot(Bot):
         self.send_text(chat_id, "Processing the image for object detection...")
 
         try:
-            with open(img_path, 'rb') as image_file:
-                response = requests.post(f"{YOLO_IP}/predict", files={'file': image_file})
+            # Extract the image name from the path (just for logging or any other purpose)
+            image_name = os.path.basename(img_path)
+            data = {
+                "s3_key": image_name
+            }
+
+            response = requests.post(f"{YOLO_IP}/predict", data=data)
 
             if response.status_code == 200:
                 detection_result = response.json()
@@ -219,12 +247,17 @@ class ImageProcessingBot(Bot):
                     prediction_data = prediction_response.json()
                     detection_objects = prediction_data.get("detection_objects", [])
                     detected_labels = [obj["label"] for obj in detection_objects if "label" in obj]
-                    objects_message = "Detected objects: " + ", ".join(detected_labels) if detected_labels else "No objects detected."
+                    objects_message = "Detected objects: " + ", ".join(
+                        detected_labels) if detected_labels else "No objects detected."
                     self.send_text(chat_id, objects_message)
+
 
                 else:
                     self.send_text(chat_id, "Error: Unable to retrieve prediction results.")
             else:
-                self.send_text(chat_id, f"Error: Could not process image for object detection. Status Code: {response.status_code}")
+                self.send_text(chat_id,
+                               f"Error: Could not process image for object detection. Status Code: {response.status_code}")
+
         except requests.exceptions.RequestException as e:
             self.send_text(chat_id, f"Error: Unable to reach the Yolo service. {e}")
+
