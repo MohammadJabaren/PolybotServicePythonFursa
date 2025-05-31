@@ -20,7 +20,7 @@ def webhook():
     bot.handle_message(req['message'])
     return 'Ok'
 
-
+#test
 if __name__ == "__main__":
     bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.fursa.click")
 
