@@ -7,12 +7,14 @@ import logging
 app = flask.Flask(__name__)
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
+
 '''BOT_APP_URL = os.environ['BOT_APP_URL']
 '''
 
 
 @app.route('/', methods=['GET'])
 def index():
+    print(f"[INFO] Loaded TELEGRAM_BOT_TOKEN: {TELEGRAM_BOT_TOKEN}")
     return 'Ok'
 
 
