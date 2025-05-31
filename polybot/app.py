@@ -2,6 +2,8 @@ import flask
 from flask import request
 import os
 from polybot.bot import ImageProcessingBot
+import logging
+
 app = flask.Flask(__name__)
 
 TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
@@ -17,6 +19,7 @@ def index():
 @app.route(f'/{TELEGRAM_BOT_TOKEN}/', methods=['POST'])
 def webhook():
     req = request.get_json()
+    logging.info(f"Received message: {req}")
     bot.handle_message(req['message'])
     return 'Ok'
 
