@@ -46,18 +46,18 @@ main() {
     echo "Project path: $project_path"
 
     # Start ngrok
-    start_ngrok_if_needed
+    #start_ngrok_if_needed
 
     # Get ngrok URL
-    bot_url=$(fetch_ngrok_url)
-    if [ -z "$bot_url" ]; then
-        echo "❌ Failed to retrieve ngrok public URL"
-        exit 1
-    fi
-    echo "ngrok URL: $bot_url"
+    #bot_url=$(fetch_ngrok_url)
+    #if [ -z "$bot_url" ]; then
+    #    echo "❌ Failed to retrieve ngrok public URL"
+    #    exit 1
+    #fi
+    #echo "ngrok URL: $bot_url"
 
     # Update .env and export URL
-    update_env_file_with_url "$ENV_FILE" "$bot_url"
+    #update_env_file_with_url "$ENV_FILE" "$bot_url"
 
     # Activate venv and run the app
     source "$VENV_PATH/bin/activate"
