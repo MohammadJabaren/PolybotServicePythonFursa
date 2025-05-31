@@ -20,6 +20,7 @@ YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3")
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
+
 class Bot:
 
     def __init__(self, token, telegram_chat_url):
@@ -40,14 +41,12 @@ class Bot:
     def is_current_msg_photo(self, msg):
         return 'photo' in msg
 
+
     def send_photo(self, chat_id, img_path):
         if not os.path.exists(img_path):
             raise RuntimeError("Image path doesn't exist")
 
-        self.telegram_bot_client.send_photo(
-            chat_id,
-            InputFile(img_path)
-        )
+        self.telegram_bot_client.send_photo(chat_id, InputFile(img_path))
 
     def download_user_photo(self, msg):
         if not self.is_current_msg_photo(msg):
@@ -123,6 +122,7 @@ class ImageProcessingBot(Bot):
             "- **concat vertical**: Combine two images top to bottom.\n\n"
             "To concatenate images, send them as a media group (album) with the respective caption!"
         )
+
 
         self.send_text(chat_id, help_text)
 
@@ -237,6 +237,7 @@ class ImageProcessingBot(Bot):
             }
 
             response = requests.post(f"{YOLO_IP}/predict", data=data)
+
             if response.status_code == 200:
                 detection_result = response.json()
                 uid = detection_result.get("prediction_uid")
@@ -249,6 +250,7 @@ class ImageProcessingBot(Bot):
                     detected_labels = [obj["label"] for obj in detection_objects if "label" in obj]
                     objects_message = "Detected objects: " + ", ".join(
                         detected_labels) if detected_labels else "No objects detected."
+
                     self.send_text(chat_id, objects_message)
 
                 else:
