@@ -10,3 +10,4 @@ boto3>=1.26.0
 
 # Environment variable loader
 python-dotenv>=1.0.0
+
