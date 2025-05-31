@@ -18,8 +18,7 @@ if not os.path.exists(PHOTO_DIR):
 
 YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3")
-S3_BUCKET = "jabaren-polybot-image"
-
+S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
 class Bot:
 
@@ -73,7 +72,7 @@ class Bot:
 
             logger.info(f"Image uploaded successfully with name: {image_name}")
 
-            return local_image_path  
+            return local_image_path
 
         except Exception as e:
             logger.error(f"Error downloading or uploading image: {e}")
