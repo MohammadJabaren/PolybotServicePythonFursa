@@ -20,7 +20,8 @@ class Bot:
         self.telegram_bot_client = telebot.TeleBot(token)
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
-        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
+        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/',
+                                             timeout=60 , certificate=open("etc/nginx/ssl/polybot-dev.crt",'r'))
 
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
         self.media_group_cache = {}
