@@ -3,6 +3,9 @@ from flask import request
 import os
 from polybot.bot import ImageProcessingBot
 import logging
+from loguru import logger
+
+TYPE_ENV = os.environ['TYPE_ENV']
 
 app = flask.Flask(__name__)
 
@@ -26,6 +29,10 @@ def webhook():
 
 #test
 if __name__ == "__main__":
-    bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.fursa.click")
+    logger.info(f'App Enviroment is : \n\n{TYPE_ENV}')
+    if TYPE_ENV == "dev":
+        bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.fursa.click")
+    else:
+        bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabarenprod.fursa.click")
 
     app.run(host='0.0.0.0', port=8443)
