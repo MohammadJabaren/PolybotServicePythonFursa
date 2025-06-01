@@ -8,6 +8,7 @@ YOLO_IP="$3"
 YOUR_AUTHTOKEN="$4"
 AWS_S3_BUCKET="$5"
 DEB_FILE="otelcol_0.127.0_linux_amd64.deb"
+TYPE_ENV="dev"
 
 
 #Monitoring
@@ -115,6 +116,7 @@ set_env_var() {
 set_env_var "TELEGRAM_BOT_TOKEN" "$TELEGRAM_TOKEN"
 set_env_var "YOLO_IP" "$YOLO_IP"
 set_env_var "AWS_S3_BUCKET" "$AWS_S3_BUCKET"
+set_env_var "TYPE_ENV" "$TYPE_ENV"
 
 
 echo " .env file is up to date."
