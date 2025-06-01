@@ -29,7 +29,7 @@ def webhook():
     host = request.headers.get('Host')
 
     # Log header info
-    logging.info(f"Received headers - X-Real-IP: {real_ip}, X-Forwarded-For: {forwarded_for}, Host: {host}")
+    logger.info(f"Received headers - X-Real-IP: {real_ip}, X-Forwarded-For: {forwarded_for}, Host: {host}")
     logging.info(f"Received message: {req}")
     bot.handle_message(req['message'])
     return 'Ok'
