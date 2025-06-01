@@ -44,4 +44,4 @@ jobs:
 #test
       - name: Execute script on EC2
         run: |
-          ssh ec2 "cd $REPO_NAME && bash deploy.sh ~/${REPO_NAME} ${{secrets.TELEGRAM_TOKEN}} ${{secrets.YOLO_IP}}"
+          ssh ec2 "cd $REPO_NAME && bash deploy.sh ~/${REPO_NAME} ${{secrets.TELEGRAM_TOKEN}} ${{secrets.YOLO_IP}} ${{secrets.AWS_S3_BUCKET_MAIN}}"
