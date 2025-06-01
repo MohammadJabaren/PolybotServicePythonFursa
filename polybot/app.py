@@ -23,6 +23,13 @@ def index():
 @app.route(f'/{TELEGRAM_BOT_TOKEN}/', methods=['POST'])
 def webhook():
     req = request.get_json()
+    # Extract headers
+    real_ip = request.headers.get('X-Real-IP')
+    forwarded_for = request.headers.get('X-Forwarded-For')
+    host = request.headers.get('Host')
+
+    # Log header info
+    logging.info(f"Received headers - X-Real-IP: {real_ip}, X-Forwarded-For: {forwarded_for}, Host: {host}")
     logging.info(f"Received message: {req}")
     bot.handle_message(req['message'])
     return 'Ok'
