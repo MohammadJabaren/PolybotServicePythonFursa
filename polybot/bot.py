@@ -19,6 +19,7 @@ if not os.path.exists(PHOTO_DIR):
 YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3")
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+TYPE_ENV = os.environ['TYPE_ENV']
 
 class Bot:
 
@@ -26,7 +27,12 @@ class Bot:
         self.telegram_bot_client = telebot.TeleBot(token)
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
-        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
+        if TYPE_ENV == "dev":
+            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
+                                             certificate=open("/home/ubuntu/PolybotServicePythonFursa/polybot/polybot-dev.crt", 'r'))
+        else:
+            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
+                                                 certificate=open("/home/ubuntu/PolybotServicePythonFursa/polybot/polybot-prod.crt", 'r'))
 
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
         self.media_group_cache = {}
