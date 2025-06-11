@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  polybot-dev:
+    image: "${IMG_NAME}"
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+#    depends_on:
+#      - yolo
+

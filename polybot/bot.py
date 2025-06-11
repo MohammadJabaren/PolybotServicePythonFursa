@@ -38,6 +38,7 @@ class Bot:
                                                      "/home/ubuntu/PolybotServicePythonFursa/polybot/polybot-prod.crt",
                                                      'r'))
 
+
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
         self.media_group_cache = {}
 
