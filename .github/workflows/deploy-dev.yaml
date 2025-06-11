@@ -43,9 +43,9 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           EC2_HOST: ${{ secrets.EC2_DEV_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          TELEGRAM_TOKEN_DEV: ${{TELEGRAM_TOKEN_DEV}}
-          YOLO_IP_DEV: ${{YOLO_IP_DEV}}
-          AWS_S3_BUCKET_DEV: ${{AWS_S3_BUCKET_DEV}}
+          TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_TOKEN_DEV}}
+          YOLO_IP_DEV: ${{secrets.YOLO_IP_DEV}}
+          AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
 
         run: |
           mkdir -p ~/.ssh
