@@ -69,7 +69,7 @@ jobs:
           echo "TYPE_ENV=dev" >> .env
 
           # Send .env and compose file to EC2
-          scp .env docker-compose.dev.yaml ec2:/home/${EC2_USERNAME}/
+          scp .env docker-compose.dev.yaml ec2:~/
 
           # SSH into EC2 and run install + deploy
           ssh ec2 '
