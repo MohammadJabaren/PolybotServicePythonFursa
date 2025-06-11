@@ -74,6 +74,7 @@ jobs:
           # SSH into EC2 and run install + deploy
           ssh ec2 '
             echo "Checking and installing Docker"
+            sudo rm -f /etc/apt/sources.list.d/docker.list
 
             if ! command -v docker &> /dev/null; then
               echo "Installing Docker..."
