@@ -102,6 +102,6 @@ jobs:
             fi
 
             echo "Starting Docker Compose services..."
-           # docker compose -f docker-compose.dev.yaml pull
-           # docker compose -f docker-compose.dev.yaml up -d
+            docker compose -f docker-compose.dev.yaml pull
+            docker compose -f docker-compose.dev.yaml up -d
           '
