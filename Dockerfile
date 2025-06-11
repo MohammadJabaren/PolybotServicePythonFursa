@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
 # Copy the application code
 COPY . .
 
-RUN pip install -r requirements.txt
+RUN pip install -r /app/polybot/requirements.txt
 # Expose the Flask port
 EXPOSE 8443
 
