@@ -62,6 +62,7 @@ jobs:
       - name: Execute script on EC2
         run: |
           # Generate .env file. 
+          echo "This is the image name :- ${{ inputs.image }}"
           echo "IMG_NAME=${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env
           echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
@@ -101,6 +102,6 @@ jobs:
             fi
 
             echo "Starting Docker Compose services..."
-            docker compose -f docker-compose.dev.yaml pull
-            docker compose -f docker-compose.dev.yaml up -d
+           # docker compose -f docker-compose.dev.yaml pull
+           # docker compose -f docker-compose.dev.yaml up -d
           '
