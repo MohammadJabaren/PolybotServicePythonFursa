@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     ports:
       - "8443:8443"
+    volumes:
+      - /home/ubuntu/polybot-dev.crt:/app/polybot-dev.crt
 #    depends_on:
 #      - yolo
 
