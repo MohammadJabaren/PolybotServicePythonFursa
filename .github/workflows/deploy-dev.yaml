@@ -62,13 +62,11 @@ jobs:
       - name: Execute script on EC2
         run: |
           # Generate .env file. 
-          echo """
-           IMG_NAME=${{ inputs.image }}
-           TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}
-           YOLO_IP=${{ secrets.YOLO_IP_DEV }}
-           AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}
-           TYPE_ENV="dev"
-          """ > .env
+          echo "IMG_NAME=${{ inputs.image }}" > .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env
+          echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
+          echo "TYPE_ENV=dev" >> .env
 
           # Send .env and compose file to EC2
           scp .env docker-compose.dev.yaml ec2:/home/${EC2_USERNAME}/
