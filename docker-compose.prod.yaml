@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  polybot-dev:
+  polybot-prod:
     image: "${IMG_NAME}"
     env_file:
       - .env
@@ -10,7 +10,8 @@ services:
       - "8443:8443"
     volumes:
       - /home/ubuntu/polybot-dev.crt:/app/polybot-dev.crt
-
+#    depends_on:
+#      - yolo
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
     ports:
@@ -24,6 +25,3 @@ services:
       - HOST_PROC=/hostfs/proc
       - HOST_SYS=/hostfs/sys
     network_mode: host
-#    depends_on:
-#      - yolo
-
