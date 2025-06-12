@@ -1,7 +1,7 @@
 # Use an official Python runtime as base image
 FROM python:3.10-slim
 
-# Create a working directory
+# Set working directory
 WORKDIR /app
 
 # Install system dependencies
@@ -12,13 +12,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy only requirements.txt first (for better layer caching)
+COPY ./polybot/requirements.txt ./requirements.txt
 
-# Copy the application code
+# Install Python dependencies
+RUN pip install -r requirements.txt
+
+# Copy the rest of the application code
 COPY . .
-
-RUN pip install -r /app/polybot/requirements.txt
-# Expose the Flask port
-EXPOSE 8443
 
 # Run the bot
 CMD ["python3", "-m", "polybot.app"]
