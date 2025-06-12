@@ -1,0 +1,12 @@
+venv/
+.env/
+
+.git/
+.gitignore
+
+LICENSE
+README.md
+__pycache__
+
+photos
+
