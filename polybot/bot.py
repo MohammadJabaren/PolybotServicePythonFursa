@@ -29,10 +29,10 @@ class Bot:
         time.sleep(0.5)
         if TYPE_ENV == "dev":
             self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                             certificate=open("/home/ubuntu/PolybotServicePythonFursa/polybot/polybot-dev.crt", 'r'))
+                                             certificate=open("/app/polybot-dev.crt", 'r'))
         else:
             self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                                 certificate=open("/home/ubuntu/PolybotServicePythonFursa/polybot/polybot-prod.crt", 'r'))
+                                                 certificate=open("/app/polybot-prod.crt", 'r'))
 
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
         self.media_group_cache = {}
