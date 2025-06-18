@@ -42,3 +42,6 @@ jobs:
       TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
       YOLO_IP: ${{secrets.YOLO_IP}}
       AWS_S3_BUCKET_MAIN: ${{secrets.AWS_S3_BUCKET_MAIN}}
+      DETECTION_OBJECTS_PROD: ${{secrets.DETECTION_OBJECTS_PROD}}
+      PREDICTION_SESSIONS_PROD: ${{secrets.PREDICTION_SESSIONS_PROD}}
+      SQS_URL_PROD: ${{secrets.SQS_URL_PROD}}
