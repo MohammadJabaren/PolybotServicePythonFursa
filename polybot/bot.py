@@ -8,6 +8,9 @@ import requests
 from dotenv import load_dotenv
 from telebot.types import InputFile
 from polybot.img_proc import Img
+import json
+from polybot.dynamodb_storage import DynamoDBStorage
+
 
 
 load_dotenv()
@@ -16,10 +19,17 @@ PHOTO_DIR = 'photos'
 if not os.path.exists(PHOTO_DIR):
     os.makedirs(PHOTO_DIR)
 
+PHOTO_DIR_PRED = 'photos/predictions'
+if not os.path.exists(PHOTO_DIR_PRED):
+    os.makedirs(PHOTO_DIR_PRED)
+
 YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3")
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
-TYPE_ENV = os.environ['TYPE_ENV']
+TYPE_ENV = os.getenv('TYPE_ENV')
+SQS_URL = os.getenv("SQS_URL")
+sqs = boto3.client("sqs")
+storage = DynamoDBStorage()
 
 class Bot:
 
@@ -28,8 +38,7 @@ class Bot:
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
         if TYPE_ENV == "dev":
-            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                             certificate=open("/app/polybot-dev.crt", 'r'))
+            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
         else:
             self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
                                                  certificate=open("/app/polybot-prod.crt", 'r'))
@@ -231,38 +240,49 @@ class ImageProcessingBot(Bot):
         self.send_photo(chat_id, result_path)
 
     def handle_detection(self, chat_id, img_path):
-        self.send_text(chat_id, "Processing the image for object detection...")
+        self.send_text(chat_id, "Sending image to SQS for processing...")
 
         try:
             # Extract the image name from the path (just for logging or any other purpose)
             image_name = os.path.basename(img_path)
-            data = {
-                "s3_key": image_name
-            }
-
-            response = requests.post(f"{YOLO_IP}/predict", data=data)
-
-            if response.status_code == 200:
-                detection_result = response.json()
-                uid = detection_result.get("prediction_uid")
-                logger.info(f'uid: {uid}')
-
-                prediction_response = requests.get(f"{YOLO_IP}/prediction/{uid}")
-                if prediction_response.status_code == 200:
-                    prediction_data = prediction_response.json()
-                    detection_objects = prediction_data.get("detection_objects", [])
-                    detected_labels = [obj["label"] for obj in detection_objects if "label" in obj]
-                    objects_message = "Detected objects: " + ", ".join(
-                        detected_labels) if detected_labels else "No objects detected."
-                    self.send_text(chat_id, objects_message)
-
-
-                else:
-                    self.send_text(chat_id, "Error: Unable to retrieve prediction results.")
-            else:
-                self.send_text(chat_id,
-                               f"Error: Could not process image for object detection. Status Code: {response.status_code}")
-
+            self.send_to_sqs(chat_id, image_name)
         except requests.exceptions.RequestException as e:
-            self.send_text(chat_id, f"Error: Unable to reach the Yolo service. {e}")
+            self.send_text(chat_id, f"Error: Unable to reach the sqs service. {e}")
+
+    def send_prediction_image(self, chat_id: int, uid: str):
+        try:
+            # Get prediction info from DynamoDB
+            prediction = storage.get_prediction(uid)
+            s3_key = prediction.get("predicted_image")  # must exist in DB
+            logger.info(f"✅ Sent  {s3_key}")
+
+            if not s3_key:
+                logger.error(f"Prediction found but no S3 key for UID: {uid}")
+                return False
+
+            # Download the image from S3 to a temp file
+            local_image_path = os.path.join(PHOTO_DIR, s3_key)
+            with open(local_image_path, "wb") as f:
+                s3.download_fileobj(S3_BUCKET, s3_key, f)
+
+            # Send image to Telegram user
+            self.send_photo(chat_id, local_image_path)
+            logger.info(f"✅ Sent prediction image to chat {chat_id} for UID {uid}")
+            return True
+
+        except Exception as e:
+            logger.error(f"❌ Failed to send prediction image for UID {uid}: {e}")
+            return False
+
+
+    def send_to_sqs(self,chat_id: int, s3_key: str):
+        message = {
+            "chat_id": chat_id,
+            "s3_key": s3_key,
+        }
+        sqs.send_message(
+            QueueUrl=SQS_URL,
+            MessageBody=json.dumps(message)
+        )
+        logger.info(f"Message sent to SQS: {message}")
 
