@@ -1,19 +1,16 @@
 import flask
-from flask import request
+from flask import request,jsonify
 import os
 from polybot.bot import ImageProcessingBot
-import logging
-from loguru import logger
-
-TYPE_ENV = os.environ['TYPE_ENV']
-
+from dotenv import load_dotenv
 app = flask.Flask(__name__)
 
-TELEGRAM_BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
+load_dotenv()
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TYPE_ENV = os.getenv('TYPE_ENV')
+STRORAGE_TYPE = os.getenv('STRORAGE_TYPE')
 
 
-'''BOT_APP_URL = os.environ['BOT_APP_URL']
-'''
 
 
 @app.route('/', methods=['GET'])
@@ -24,23 +21,43 @@ def index():
 @app.route(f'/{TELEGRAM_BOT_TOKEN}/', methods=['POST'])
 def webhook():
     req = request.get_json()
-    # Extract headers
-    real_ip = request.headers.get('X-Real-IP')
-    forwarded_for = request.headers.get('X-Forwarded-For')
-    host = request.headers.get('Host')
-
-    # Log header info
-    logger.info(f"Received headers - X-Real-IP: {real_ip}, X-Forwarded-For: {forwarded_for}, Host: {host}")
-    logging.info(f"Received message: {req}")
     bot.handle_message(req['message'])
     return 'Ok'
 
-#test
+
+@app.route("/notify", methods=["POST"])
+def notify_user_with_image():
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+    data = request.get_json()
+    chat_id = data.get("chat_id")
+    if not chat_id:
+        return jsonify({"error": "Missing chat_id"}), 400
+
+    # Case 1: DynamoDB (UID provided, fetch and send image)
+    if STRORAGE_TYPE == "dynamodb":
+        uid = data.get("uid")
+        success = bot.send_prediction_image(chat_id, uid)
+        if success:
+            return jsonify({"status": "sent"}), 200
+        else:
+            return jsonify({"error": "Failed to send image"}), 500
+
+    # Case 2: SQLite (Labels provided)
+    else:
+        try:
+            labels = data.get("labels")
+            label_text = ", ".join(labels)
+            bot.send_text(chat_id, f"Objects detected: {label_text}")
+            return jsonify({"status": "labels sent"}), 200
+        except Exception as e:
+            return jsonify({"error": f"Failed to send labels: {e}"}), 500
+
+
 if __name__ == "__main__":
-    logger.info(f'App Enviroment is : \n\n{TYPE_ENV}')
     if TYPE_ENV == "dev":
         bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.fursa.click")
     else:
         bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabarenprod.fursa.click")
-
     app.run(host='0.0.0.0', port=8443)

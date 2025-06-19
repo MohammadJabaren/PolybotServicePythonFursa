@@ -19,6 +19,12 @@ on:
         required: true
       AWS_S3_BUCKET_DEV:
         required: true
+      DETECTION_OBJECTS_DEV:
+        required: true
+      PREDICTION_SESSIONS_DEV:
+        required: true
+      SQS_URL_DEV:
+        required: true
 
   workflow_dispatch:
     inputs:
@@ -46,6 +52,9 @@ jobs:
           TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_TOKEN_DEV}}
           YOLO_IP_DEV: ${{secrets.YOLO_IP_DEV}}
           AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
+          DETECTION_OBJECTS_DEV: ${{secrets.DETECTION_OBJECTS_DEV}}
+          PREDICTION_SESSIONS_DEV: ${{secrets.PREDICTION_SESSIONS_DEV}}
+          SQS_URL_DEV: ${{secrets.SQS_URL_DEV}}
 
         run: |
           mkdir -p ~/.ssh
@@ -68,6 +77,10 @@ jobs:
           echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
           echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
           echo "TYPE_ENV=dev" >> .env
+          echo "STRORAGE_TYPE=dynamodb" >> .env
+          echo "PREDICTION_SESSIONS=${{ secrets.PREDICTION_SESSIONS_DEV }}" >> .env
+          echo "DETECTION_OBJECTS=${{ secrets.DETECTION_OBJECTS_DEV }}" >> .env
+          echo "SQS_URL=${{ secrets.SQS_URL_DEV }}" >> .env
 
           # Send .env and compose file to EC2
           scp .env docker-compose.dev.yaml otelcol-config.yaml ec2:~/
