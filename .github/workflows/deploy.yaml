@@ -82,7 +82,8 @@ jobs:
           echo "PREDICTION_SESSIONS=${{ secrets.PREDICTION_SESSIONS_PROD }}" >> .env
           echo "DETECTION_OBJECTS=${{ secrets.DETECTION_OBJECTS_PROD }}" >> .env
           echo "SQS_URL=${{ secrets.SQS_URL_PROD }}" >> .env
-
+           echo "AWS_REGION=us-west-1" >> .env
+         
           # Send .env and compose file to EC2
           scp .env docker-compose.prod.yaml otelcol-config.yaml ec2:~/
           
