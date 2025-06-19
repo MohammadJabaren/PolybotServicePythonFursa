@@ -1,9 +1,13 @@
-name: Docker Scout PR Scan
+name: Docker Scout Scan
 
 on:
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
+  pull-requests: write  # 👈 Required to post comments on PR
 
 jobs:
   docker-scout:
@@ -32,7 +36,8 @@ jobs:
         command: cves
         image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-scout:${{ github.sha }}
         only-severities: critical,high
-        exit-code: 1                    # ❌ Fail the job if CRITICAL or HIGH vulnerabilities
-        summary: true                   # ✅ Show results in GitHub Actions summary
-        write-comment: true            # ✅ Post a comment on the PR
+        exit-code: 1
+        summary: true
+        write-comment: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        format: json
