@@ -29,6 +29,7 @@ jobs:
     - name: Run Docker Scout scan
       uses: docker/scout-action@v1
       with:
+        command: cves
         image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-scout:${{ github.sha }}
         only-severities: critical,high
         exit-code: 1                    # ❌ Fail the job if CRITICAL or HIGH vulnerabilities
