@@ -13,7 +13,7 @@ from polybot.dynamodb_storage import DynamoDBStorage
 
 
 load_dotenv()
-
+AWS_REGION = os.getenv("AWS_REGION", "us-west-1")
 PHOTO_DIR = 'photos'
 if not os.path.exists(PHOTO_DIR):
     os.makedirs(PHOTO_DIR)
@@ -23,11 +23,11 @@ if not os.path.exists(PHOTO_DIR_PRED):
     os.makedirs(PHOTO_DIR_PRED)
 
 YOLO_IP = os.getenv("YOLO_IP")
-s3 = boto3.client("s3")
+s3 = boto3.client("s3",region_name=AWS_REGION)
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 TYPE_ENV = os.getenv('TYPE_ENV')
 SQS_URL = os.getenv("SQS_URL")
-sqs = boto3.client("sqs")
+sqs = boto3.client("sqs",region_name=AWS_REGION)
 storage = DynamoDBStorage()
 
 class Bot:
