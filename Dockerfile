@@ -1,7 +1,5 @@
 FROM python:3.10-alpine
 
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
@@ -30,4 +28,5 @@ RUN pip install --upgrade pip setuptools && \
 # Copy rest of the application
 COPY . .
 
+# Run the bot
 CMD ["python3", "-m", "polybot.app"]
