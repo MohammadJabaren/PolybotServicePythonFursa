@@ -19,6 +19,13 @@ on:
         required: true
       AWS_S3_BUCKET_MAIN:
         required: true
+      DETECTION_OBJECTS_PROD:
+        required: true
+      PREDICTION_SESSIONS_PROD:
+        required: true
+      SQS_URL_PROD:
+        required: true
+
 
   workflow_dispatch:
     inputs:
@@ -46,6 +53,9 @@ jobs:
           TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
           YOLO_IP: ${{secrets.YOLO_IP}}
           AWS_S3_BUCKET_MAIN: ${{secrets.AWS_S3_BUCKET_MAIN}}
+          DETECTION_OBJECTS_PROD: ${{secrets.DETECTION_OBJECTS_PROD}}
+          PREDICTION_SESSIONS_PROD: ${{secrets.PREDICTION_SESSIONS_PROD}}
+          SQS_URL_PROD: ${{secrets.SQS_URL_PROD}}
 
         run: |
           mkdir -p ~/.ssh
@@ -68,7 +78,12 @@ jobs:
           echo "YOLO_IP=${{ secrets.YOLO_IP }}" >> .env
           echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_MAIN }}" >> .env
           echo "TYPE_ENV=prod" >> .env
-
+          echo "STRORAGE_TYPE=dynamodb" >> .env
+          echo "PREDICTION_SESSIONS=${{ secrets.PREDICTION_SESSIONS_PROD }}" >> .env
+          echo "DETECTION_OBJECTS=${{ secrets.DETECTION_OBJECTS_PROD }}" >> .env
+          echo "SQS_URL=${{ secrets.SQS_URL_PROD }}" >> .env
+           echo "AWS_REGION=us-west-1" >> .env
+         
           # Send .env and compose file to EC2
           scp .env docker-compose.prod.yaml otelcol-config.yaml ec2:~/
           

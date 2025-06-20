@@ -1,25 +1,31 @@
-# Use an official Python runtime as base image
-FROM python:3.10-slim
+FROM python:3.10-alpine
 
-# Set working directory
+
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies compatible with Alpine
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+    build-base \
+    libffi-dev \
+    musl-dev \
+    jpeg-dev \
+    zlib-dev \
+    libstdc++ \
+    mesa-gl \
+    libxrender \
+    libxext \
+    libsm \
+    curl
 
-# Copy only requirements.txt first (for better layer caching)
+# Copy only requirements file for layer caching
 COPY ./polybot/requirements.txt ./requirements.txt
 
-# Install Python dependencies
-RUN pip install -r requirements.txt
+# Upgrade pip and setuptools
+RUN pip install --upgrade pip setuptools && \
+    pip install -r requirements.txt
 
-# Copy the rest of the application code
+# Copy rest of the application
 COPY . .
 
-# Run the bot
 CMD ["python3", "-m", "polybot.app"]
