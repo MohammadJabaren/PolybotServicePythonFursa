@@ -1,28 +1,25 @@
-FROM python:3.10-slim
+FROM python:3.10-bookworm
 
 WORKDIR /app
 
-# Upgrade system and install patched libs
+# Install only necessary system libraries
 RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    libxml2 \
-    libicu72 \
-    libpam0g \
-    curl && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+    curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Use layer caching for dependencies
 COPY ./polybot/requirements.txt ./requirements.txt
 
-# Upgrade pip/setuptools to reduce CVEs
-RUN pip install --upgrade pip setuptools \
-    && pip install -r requirements.txt
+# Upgrade pip and setuptools to fixed versions
+RUN pip install --upgrade pip setuptools && \
+    pip install --no-cache-dir -r requirements.txt
 
+# Copy the full app
 COPY . .
 
 CMD ["python3", "-m", "polybot.app"]
