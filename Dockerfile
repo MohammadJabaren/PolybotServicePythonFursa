@@ -1,26 +1,34 @@
+# Use a lightweight Alpine-based Python image
 FROM python:3.10-alpine
 
+# Prevent interactive prompts during install
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive
 
+# Set working directory
 WORKDIR /app
 
-# Install only necessary system libraries
-RUN apt-get update && \
-    apt-get dist-upgrade -y && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    curl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install required system dependencies for Python packages
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+    build-base \
+    libffi-dev \
+    musl-dev \
+    jpeg-dev \
+    zlib-dev \
+    libgl1 \
+    libx11 \
+    libstdc++ \
+    curl
 
-# Use layer caching for dependencies
+# Install Python dependencies
 COPY ./polybot/requirements.txt ./requirements.txt
-
-# Upgrade pip and setuptools to fixed versions
 RUN pip install --upgrade pip setuptools && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install -r requirements.txt
 
-# Copy the full app
+# Copy application code
 COPY . .
 
+# Set default command
 CMD ["python3", "-m", "polybot.app"]
