@@ -1,6 +1,5 @@
 FROM python:3.10-alpine
 
-# Prevent interactive prompts during install
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
@@ -15,21 +14,20 @@ RUN apk update && apk upgrade && \
     jpeg-dev \
     zlib-dev \
     libstdc++ \
+    mesa-gl \
     libxrender \
     libxext \
     libsm \
-    libgl \
     curl
 
-# Copy only requirements first
+# Copy only requirements file for layer caching
 COPY ./polybot/requirements.txt ./requirements.txt
 
-# Upgrade pip and install Python dependencies
+# Upgrade pip and setuptools
 RUN pip install --upgrade pip setuptools && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install -r requirements.txt
 
-# Copy application code
+# Copy rest of the application
 COPY . .
 
-# Run the app
 CMD ["python3", "-m", "polybot.app"]
