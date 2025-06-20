@@ -1,7 +1,5 @@
 FROM python:3.10-alpine
 
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
