@@ -57,7 +57,7 @@ def notify_user_with_image():
 
 if __name__ == "__main__":
     if TYPE_ENV == "dev":
-        bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.fursa.click")
+        bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabaren.dev.fursa.click")
     else:
         bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, "https://jabarenprod.fursa.click")
     app.run(host='0.0.0.0', port=8443)

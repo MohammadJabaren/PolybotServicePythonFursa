@@ -22,10 +22,8 @@ PHOTO_DIR_PRED = 'photos/predictions'
 if not os.path.exists(PHOTO_DIR_PRED):
     os.makedirs(PHOTO_DIR_PRED)
 
-YOLO_IP = os.getenv("YOLO_IP")
 s3 = boto3.client("s3",region_name=AWS_REGION)
 S3_BUCKET = os.getenv("AWS_S3_BUCKET")
-TYPE_ENV = os.getenv('TYPE_ENV')
 SQS_URL = os.getenv("SQS_URL")
 sqs = boto3.client("sqs",region_name=AWS_REGION)
 storage = DynamoDBStorage()
@@ -36,13 +34,7 @@ class Bot:
         self.telegram_bot_client = telebot.TeleBot(token)
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
-        if TYPE_ENV == "dev":
-            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                             certificate=open("/app/polybot-dev.crt", 'r'))
-        else:
-            self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                                 certificate=open("/app/polybot-prod.crt", 'r'))
-
+        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
         self.media_group_cache = {}
 

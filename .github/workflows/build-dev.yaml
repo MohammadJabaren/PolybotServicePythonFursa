@@ -30,18 +30,18 @@ jobs:
          # build & push the image 
          docker build --push -t $img_name  .
 
-  Deploy:
-    needs: Build
-    uses: ./.github/workflows/deploy-dev.yaml
-    with:
-      image: ${{ needs.Build.outputs.image }}
-    secrets:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      EC2_DEV_HOST: ${{ secrets.EC2_DEV_HOST }}
-      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-      TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_TOKEN_DEV}}
-      YOLO_IP_DEV: ${{secrets.YOLO_IP_DEV}}
-      AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
-      DETECTION_OBJECTS_DEV: ${{secrets.DETECTION_OBJECTS_DEV}}
-      PREDICTION_SESSIONS_DEV: ${{secrets.PREDICTION_SESSIONS_DEV}}
-      SQS_URL_DEV: ${{secrets.SQS_URL_DEV}}
+ # Deploy:
+ #   needs: Build
+ #   uses: ./.github/workflows/deploy-dev.yaml
+ #   with:
+ #     image: ${{ needs.Build.outputs.image }}
+ #   secrets:
+ #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+ #     EC2_DEV_HOST: ${{ secrets.EC2_DEV_HOST }}
+ #     EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+ #     TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_TOKEN_DEV}}
+ #     YOLO_IP_DEV: ${{secrets.YOLO_IP_DEV}}
+ #     AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
+ #     DETECTION_OBJECTS_DEV: ${{secrets.DETECTION_OBJECTS_DEV}}
+ #     PREDICTION_SESSIONS_DEV: ${{secrets.PREDICTION_SESSIONS_DEV}}
+ #     SQS_URL_DEV: ${{secrets.SQS_URL_DEV}}
